@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
@@ -44,9 +45,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
-  final List<String> bufoTypes = ['happy_bufo', 'sleepy_bufo', 'party_bufo'];
+  List<String> bufoTypes = [];
   Map<String, String> history = {};
   String? todaysBufo;
+  bool _isLoading = true;
   
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
@@ -54,17 +56,35 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   @override
   void initState() {
     super.initState();
-    _loadHistory();
+    _initApp();
     
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
     _scaleAnimation = CurvedAnimation(parent: _controller, curve: Curves.elasticOut);
+  }
+
+  Future<void> _initApp() async {
+    final manifestContent = await rootBundle.loadString('AssetManifest.json');
+    final Map<String, dynamic> manifestMap = jsonDecode(manifestContent);
     
-    if (todaysBufo != null) {
-      _controller.value = 1.0;
-    }
+    final bufos = manifestMap.keys
+        .where((key) => key.startsWith('assets/images/') && 
+               (key.endsWith('.png') || key.endsWith('.gif') || key.endsWith('.jpg') || key.endsWith('.jpeg')))
+        .map((key) => key.split('/').last)
+        .toList();
+
+    if (!mounted) return;
+    
+    setState(() {
+      bufoTypes = bufos;
+      _loadHistory();
+      if (todaysBufo != null) {
+        _controller.value = 1.0;
+      }
+      _isLoading = false;
+    });
   }
 
   @override
@@ -74,7 +94,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   String _formatBufoName(String bufo) {
-    String formatted = bufo.replaceAll('_bufo', ' Poluśka');
+    int dotIndex = bufo.lastIndexOf('.');
+    String name = dotIndex != -1 ? bufo.substring(0, dotIndex) : bufo;
+    
+    String formatted = name.replaceAll('-bufo', ' Poluśka')
+                           .replaceAll('bufo-', 'Poluśka ')
+                           .replaceAll('_bufo', ' Poluśka')
+                           .replaceAll('bufo', 'Poluśka')
+                           .replaceAll('-', ' ')
+                           .replaceAll('_', ' ')
+                           .trim();
+    
     if (formatted.isEmpty) return formatted;
     return formatted[0].toUpperCase() + formatted.substring(1);
   }
@@ -99,6 +129,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   void _rollBufo() {
+    if (bufoTypes.isEmpty) return;
     final random = Random();
     final selected = bufoTypes[random.nextInt(bufoTypes.length)];
     
@@ -131,7 +162,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       final date = sortedKeys[index];
                       final bufo = history[date]!;
                       return ListTile(
-                        leading: Image.asset('assets/images/$bufo.png', width: 40, height: 40),
+                        leading: Image.asset(
+                          bufo.contains('.') ? 'assets/images/$bufo' : 'assets/images/$bufo.png', 
+                          width: 40, 
+                          height: 40,
+                          errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
+                        ),
                         title: Text(date),
                         subtitle: Text(_formatBufoName(bufo)),
                       );
@@ -166,7 +202,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ),
         ],
       ),
-      body: Center(
+      body: _isLoading ? const Center(child: CircularProgressIndicator()) : Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
@@ -204,9 +240,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 ScaleTransition(
                   scale: _scaleAnimation,
                   child: Image.asset(
-                    'assets/images/$todaysBufo.png',
+                    todaysBufo!.contains('.') ? 'assets/images/$todaysBufo' : 'assets/images/$todaysBufo.png',
                     width: 250,
                     height: 250,
+                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.image_not_supported, size: 100),
                   ),
                 ),
                 const SizedBox(height: 20),
