@@ -266,11 +266,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               ] else ...[
                 const Spacer(flex: 2),
                 Text(
-                  'Today, you are a...',
+                  'Today, you are...',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.outfit(fontSize: 28, color: const Color(0xFF3E4A43)),
                 ),
-                const Spacer(flex: 3),
+                const Spacer(flex: 1),
                 ScaleTransition(
                   scale: _scaleAnimation,
                   child: Image.asset(
@@ -280,7 +280,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     errorBuilder: (context, error, stackTrace) => const Icon(Icons.image_not_supported, size: 100),
                   ),
                 ),
-                const Spacer(flex: 2),
+                const Spacer(flex: 1),
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
