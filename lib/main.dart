@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
@@ -28,7 +29,7 @@ class DailyPoluskaApp extends StatelessWidget {
           surface: const Color(0xFFF1F8E9),
         ),
         useMaterial3: true,
-        fontFamily: 'Roboto', // Default, but can be customized
+        textTheme: GoogleFonts.honkTextTheme(Theme.of(context).textTheme),
       ),
       home: HomePage(prefs: prefs),
     );
