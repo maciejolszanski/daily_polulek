@@ -29,7 +29,7 @@ class DailyPoluskaApp extends StatelessWidget {
           surface: const Color(0xFFF1F8E9),
         ),
         useMaterial3: true,
-        textTheme: GoogleFonts.honkTextTheme(Theme.of(context).textTheme),
+        fontFamily: 'Roboto',
       ),
       home: HomePage(prefs: prefs),
     );
@@ -179,7 +179,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                           errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
                         ),
                         title: Text(date),
-                        subtitle: Text(_formatBufoName(bufo)),
+                        subtitle: Text(_formatBufoName(bufo), style: GoogleFonts.honk(fontSize: 20)),
                       );
                     },
                   ),
@@ -259,9 +259,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 const SizedBox(height: 20),
                 Text(
                   '${_formatBufoName(todaysBufo!)}!',
-                  style: TextStyle(
-                    fontSize: 32, 
-                    fontWeight: FontWeight.bold, 
+                  style: GoogleFonts.honk(
+                    fontSize: 48, 
                     color: Theme.of(context).colorScheme.primary
                   ),
                 ),
