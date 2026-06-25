@@ -73,6 +73,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     super.dispose();
   }
 
+  String _formatBufoName(String bufo) {
+    String formatted = bufo.replaceAll('_bufo', ' Poluśka');
+    if (formatted.isEmpty) return formatted;
+    return formatted[0].toUpperCase() + formatted.substring(1);
+  }
+
   String _getTodayDateString() {
     final now = DateTime.now();
     return "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
@@ -127,7 +133,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       return ListTile(
                         leading: Image.asset('assets/images/$bufo.png', width: 40, height: 40),
                         title: Text(date),
-                        subtitle: Text(bufo.replaceAll('_bufo', ' Poluśka')),
+                        subtitle: Text(_formatBufoName(bufo)),
                       );
                     },
                   ),
@@ -205,7 +211,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  '${todaysBufo!.replaceAll('_bufo', ' Poluśka')}!',
+                  '${_formatBufoName(todaysBufo!)}!',
                   style: TextStyle(
                     fontSize: 32, 
                     fontWeight: FontWeight.bold, 
