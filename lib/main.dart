@@ -66,10 +66,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   Future<void> _initApp() async {
-    final manifestContent = await rootBundle.loadString('AssetManifest.json');
-    final Map<String, dynamic> manifestMap = jsonDecode(manifestContent);
+    final AssetManifest assetManifest = await AssetManifest.loadFromAssetBundle(rootBundle);
     
-    final bufos = manifestMap.keys
+    final bufos = assetManifest.listAssets()
         .where((key) => key.startsWith('assets/images/') && 
                (key.endsWith('.png') || key.endsWith('.gif') || key.endsWith('.jpg') || key.endsWith('.jpeg')))
         .map((key) => key.split('/').last)
@@ -80,6 +79,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     setState(() {
       bufoTypes = bufos;
       _loadHistory();
+      
+      // If the saved bufo no longer exists in our new list (e.g. old deleted bufos),
+      // reset it so the user can roll a new one.
+      if (todaysBufo != null && !bufoTypes.contains(todaysBufo)) {
+        todaysBufo = null;
+      }
+      
       if (todaysBufo != null) {
         _controller.value = 1.0;
       }
@@ -97,16 +103,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     int dotIndex = bufo.lastIndexOf('.');
     String name = dotIndex != -1 ? bufo.substring(0, dotIndex) : bufo;
     
-    String formatted = name.replaceAll('-bufo', ' Poluśka')
-                           .replaceAll('bufo-', 'Poluśka ')
-                           .replaceAll('_bufo', ' Poluśka')
-                           .replaceAll('bufo', 'Poluśka')
-                           .replaceAll('-', ' ')
-                           .replaceAll('_', ' ')
-                           .trim();
+    String formatted = name.replaceAll(RegExp(r'-bufo-|-bufo|_bufo_|bufo-|bufo_|_bufo|bufo', caseSensitive: false), ' Poluśka ');
+    formatted = formatted.replaceAll('-', ' ').replaceAll('_', ' ');
+    formatted = formatted.replaceAll(RegExp(r'\s+'), ' ').trim();
     
     if (formatted.isEmpty) return formatted;
-    return formatted[0].toUpperCase() + formatted.substring(1);
+    
+    List<String> words = formatted.split(' ');
+    for (int i = 0; i < words.length; i++) {
+      if (words[i].isNotEmpty) {
+        words[i] = words[i][0].toUpperCase() + words[i].substring(1).toLowerCase();
+      }
+    }
+    return words.join(' ');
   }
 
   String _getTodayDateString() {
