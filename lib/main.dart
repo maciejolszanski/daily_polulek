@@ -23,13 +23,13 @@ class DailyPoluskaApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFFC8E6C9), // Pastel green
-          primary: const Color(0xFF81C784),
-          secondary: const Color(0xFFFFCC80), // Pastel orange
-          surface: const Color(0xFFF1F8E9),
+          seedColor: const Color(0xFF2E4F32), 
+          primary: const Color(0xFF2E4F32),
+          secondary: const Color(0xFFFFCC80), 
+          surface: const Color(0xFFF6F3E6),
         ),
         useMaterial3: true,
-        fontFamily: 'Roboto',
+        fontFamily: GoogleFonts.outfit().fontFamily,
       ),
       home: HomePage(prefs: prefs),
     );
@@ -179,7 +179,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                           errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
                         ),
                         title: Text(date),
-                        subtitle: Text(_formatBufoName(bufo), style: GoogleFonts.honk(fontSize: 20)),
+                        subtitle: Text(_formatBufoName(bufo), style: GoogleFonts.balsamiqSans(fontSize: 20)),
                       );
                     },
                   ),
@@ -212,41 +212,47 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ),
         ],
       ),
-      body: _isLoading ? const Center(child: CircularProgressIndicator()) : Center(
+      body: _isLoading ? const Center(child: CircularProgressIndicator()) : SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               if (todaysBufo == null) ...[
-                const Text(
+                const Spacer(),
+                Text(
                   'What kind of Poluśka are you today?',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black87),
+                  style: GoogleFonts.outfit(fontSize: 28, color: const Color(0xFF3E4A43)),
                 ),
                 const SizedBox(height: 40),
-                ElevatedButton(
-                  onPressed: _rollBufo,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
-                    foregroundColor: Colors.black87,
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: _rollBufo,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.secondary,
+                      foregroundColor: Colors.black87,
+                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      elevation: 5,
                     ),
-                    elevation: 5,
-                  ),
-                  child: const Text(
-                    'Find Out!',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    child: const Text(
+                      'Find Out!',
+                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
+                const Spacer(),
               ] else ...[
-                const Text(
+                const Spacer(flex: 2),
+                Text(
                   'Today, you are a...',
-                  style: TextStyle(fontSize: 24, color: Colors.black54),
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.outfit(fontSize: 28, color: const Color(0xFF3E4A43)),
                 ),
-                const SizedBox(height: 20),
+                const Spacer(flex: 3),
                 ScaleTransition(
                   scale: _scaleAnimation,
                   child: Image.asset(
@@ -256,19 +262,40 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     errorBuilder: (context, error, stackTrace) => const Icon(Icons.image_not_supported, size: 100),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const Spacer(flex: 2),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Poluśka',
+                      style: GoogleFonts.outfit(fontSize: 22, color: Colors.black87),
+                    ),
+                    Builder(
+                      builder: (context) {
+                        String fullName = _formatBufoName(todaysBufo!);
+                        String mainWord = fullName.replaceAll('Poluśka', '').trim();
+                        if (mainWord.isEmpty) mainWord = "Bufo";
+                        return Text(
+                          '$mainWord!',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.fredoka(
+                            fontSize: 72, 
+                            fontWeight: FontWeight.w600, 
+                            color: const Color(0xFF4A6B42),
+                            height: 1.0,
+                          ),
+                        );
+                      }
+                    ),
+                  ],
+                ),
+                const Spacer(flex: 3),
                 Text(
-                  '${_formatBufoName(todaysBufo!)}!',
-                  style: GoogleFonts.honk(
-                    fontSize: 48, 
-                    color: Theme.of(context).colorScheme.primary
-                  ),
-                ),
-                const SizedBox(height: 40),
-                const Text(
                   'Come back tomorrow for a new Poluśka!',
-                  style: TextStyle(fontSize: 16, color: Colors.black45),
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.kodeMono(fontSize: 14, color: Colors.black87),
                 ),
+                const Spacer(flex: 1),
               ],
             ],
           ),
