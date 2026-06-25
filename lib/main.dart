@@ -49,6 +49,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   List<String> bufoTypes = [];
   Map<String, String> history = {};
   String? todaysBufo;
+  bool isConfirmed = false;
   bool _isLoading = true;
   
   late AnimationController _controller;
@@ -131,6 +132,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       history = decoded.map((key, value) => MapEntry(key, value.toString()));
     }
     todaysBufo = history[_getTodayDateString()];
+    isConfirmed = todaysBufo != null;
   }
 
   void _saveHistory() {
@@ -141,15 +143,31 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   void _rollBufo() {
     if (bufoTypes.isEmpty) return;
     final random = Random();
-    final selected = bufoTypes[random.nextInt(bufoTypes.length)];
+    String selected;
+    
+    if (bufoTypes.length > 1 && todaysBufo != null) {
+      do {
+        selected = bufoTypes[random.nextInt(bufoTypes.length)];
+      } while (selected == todaysBufo);
+    } else {
+      selected = bufoTypes[random.nextInt(bufoTypes.length)];
+    }
     
     setState(() {
       todaysBufo = selected;
-      history[_getTodayDateString()] = selected;
-      _saveHistory();
+      isConfirmed = false;
     });
     
     _controller.forward(from: 0.0);
+  }
+
+  void _confirmBufo() {
+    if (todaysBufo == null) return;
+    setState(() {
+      isConfirmed = true;
+      history[_getTodayDateString()] = todaysBufo!;
+      _saveHistory();
+    });
   }
 
   void _showHistoryDialog() {
@@ -290,11 +308,53 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   ],
                 ),
                 const Spacer(flex: 3),
-                Text(
-                  'Come back tomorrow for a new Poluśka!',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.kodeMono(fontSize: 14, color: Colors.black87),
-                ),
+                if (!isConfirmed) ...[
+                  Text(
+                    'Is this how you feel today?',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.outfit(fontSize: 20, color: const Color(0xFF3E4A43)),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      OutlinedButton.icon(
+                        onPressed: _rollBufo,
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('No, re-roll'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.black87,
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        ),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: _confirmBufo,
+                        icon: const Icon(Icons.check),
+                        label: const Text('Yes!'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.secondary,
+                          foregroundColor: Colors.black87,
+                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                          elevation: 3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ] else ...[
+                  Text(
+                    'Come back tomorrow for a new Poluśka!',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.kodeMono(fontSize: 14, color: Colors.black87),
+                  ),
+                  const SizedBox(height: 10),
+                  TextButton(
+                    onPressed: _rollBufo,
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.black54,
+                    ),
+                    child: const Text('Actually, I feel different...', style: TextStyle(fontSize: 12)),
+                  ),
+                ],
                 const Spacer(flex: 1),
               ],
             ],
