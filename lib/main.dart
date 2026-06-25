@@ -1,121 +1,226 @@
+import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+  runApp(DailyPoluskaApp(prefs: prefs));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class DailyPoluskaApp extends StatelessWidget {
+  final SharedPreferences prefs;
 
-  // This widget is the root of your application.
+  const DailyPoluskaApp({super.key, required this.prefs});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Daily Poluśka',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFFC8E6C9), // Pastel green
+          primary: const Color(0xFF81C784),
+          secondary: const Color(0xFFFFCC80), // Pastel orange
+          surface: const Color(0xFFF1F8E9),
+        ),
+        useMaterial3: true,
+        fontFamily: 'Roboto', // Default, but can be customized
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: HomePage(prefs: prefs),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class HomePage extends StatefulWidget {
+  final SharedPreferences prefs;
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+  const HomePage({super.key, required this.prefs});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+  final List<String> bufoTypes = ['happy_bufo', 'sleepy_bufo', 'party_bufo'];
+  Map<String, String> history = {};
+  String? todaysBufo;
+  
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
 
-  void _incrementCounter() {
+  @override
+  void initState() {
+    super.initState();
+    _loadHistory();
+    
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _scaleAnimation = CurvedAnimation(parent: _controller, curve: Curves.elasticOut);
+    
+    if (todaysBufo != null) {
+      _controller.value = 1.0;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  String _getTodayDateString() {
+    final now = DateTime.now();
+    return "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+  }
+
+  void _loadHistory() {
+    final String? historyJson = widget.prefs.getString('bufo_history');
+    if (historyJson != null) {
+      final Map<String, dynamic> decoded = jsonDecode(historyJson);
+      history = decoded.map((key, value) => MapEntry(key, value.toString()));
+    }
+    todaysBufo = history[_getTodayDateString()];
+  }
+
+  void _saveHistory() {
+    final String encoded = jsonEncode(history);
+    widget.prefs.setString('bufo_history', encoded);
+  }
+
+  void _rollBufo() {
+    final random = Random();
+    final selected = bufoTypes[random.nextInt(bufoTypes.length)];
+    
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      todaysBufo = selected;
+      history[_getTodayDateString()] = selected;
+      _saveHistory();
     });
+    
+    _controller.forward(from: 0.0);
+  }
+
+  void _showHistoryDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final sortedKeys = history.keys.toList()..sort((a, b) => b.compareTo(a));
+        
+        return AlertDialog(
+          title: const Text('Past Poluśkas', style: TextStyle(fontWeight: FontWeight.bold)),
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          content: SizedBox(
+            width: double.maxFinite,
+            child: sortedKeys.isEmpty
+                ? const Text('No history yet. Come back tomorrow!')
+                : ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: sortedKeys.length,
+                    itemBuilder: (context, index) {
+                      final date = sortedKeys[index];
+                      final bufo = history[date]!;
+                      return ListTile(
+                        leading: Image.asset('assets/images/$bufo.png', width: 40, height: 40),
+                        title: Text(date),
+                        subtitle: Text(bufo.replaceAll('_', ' ').toUpperCase()),
+                      );
+                    },
+                  ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text('Daily Poluśka', style: TextStyle(fontWeight: FontWeight.w600)),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.calendar_month),
+            onPressed: _showHistoryDialog,
+            tooltip: 'History',
+          ),
+        ],
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (todaysBufo == null) ...[
+                const Text(
+                  'What kind of Poluśka are you today?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black87),
+                ),
+                const SizedBox(height: 40),
+                ElevatedButton(
+                  onPressed: _rollBufo,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
+                    foregroundColor: Colors.black87,
+                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    elevation: 5,
+                  ),
+                  child: const Text(
+                    'Find Out!',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ] else ...[
+                const Text(
+                  'Today, you are a...',
+                  style: TextStyle(fontSize: 24, color: Colors.black54),
+                ),
+                const SizedBox(height: 20),
+                ScaleTransition(
+                  scale: _scaleAnimation,
+                  child: Image.asset(
+                    'assets/images/$todaysBufo.png',
+                    width: 250,
+                    height: 250,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  '${todaysBufo!.replaceAll('_', ' ').toUpperCase()}!',
+                  style: TextStyle(
+                    fontSize: 32, 
+                    fontWeight: FontWeight.bold, 
+                    color: Theme.of(context).colorScheme.primary
+                  ),
+                ),
+                const SizedBox(height: 40),
+                const Text(
+                  'Come back tomorrow for a new Poluśka!',
+                  style: TextStyle(fontSize: 16, color: Colors.black45),
+                ),
+              ],
+            ],
+          ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
