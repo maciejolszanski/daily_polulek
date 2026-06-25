@@ -127,7 +127,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       return ListTile(
                         leading: Image.asset('assets/images/$bufo.png', width: 40, height: 40),
                         title: Text(date),
-                        subtitle: Text(bufo.replaceAll('_', ' ').toUpperCase()),
+                        subtitle: Text(bufo.replaceAll('_bufo', ' Poluśka')),
                       );
                     },
                   ),
@@ -205,7 +205,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  '${todaysBufo!.replaceAll('_', ' ').toUpperCase()}!',
+                  '${todaysBufo!.replaceAll('_bufo', ' Poluśka')}!',
                   style: TextStyle(
                     fontSize: 32, 
                     fontWeight: FontWeight.bold, 
