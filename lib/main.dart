@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'poluska_service.dart';
+import 'history_screen.dart';
+import 'all_possible_poluskas_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -135,48 +137,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     });
   }
 
-  void _showHistoryDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        final sortedKeys = history.keys.toList()..sort((a, b) => b.compareTo(a));
-        
-        return AlertDialog(
-          title: const Text('Past Poluśkas', style: TextStyle(fontWeight: FontWeight.bold)),
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          content: SizedBox(
-            width: double.maxFinite,
-            child: sortedKeys.isEmpty
-                ? const Text('No history yet. Come back tomorrow!')
-                : ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: sortedKeys.length,
-                    itemBuilder: (context, index) {
-                      final date = sortedKeys[index];
-                      final bufo = history[date]!;
-                      return ListTile(
-                        leading: Image.asset(
-                          bufo.contains('.') ? 'assets/images/$bufo' : 'assets/images/$bufo.png', 
-                          width: 40, 
-                          height: 40,
-                          errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
-                        ),
-                        title: Text(date),
-                        subtitle: Text(_formatBufoName(bufo), style: GoogleFonts.balsamiqSans(fontSize: 20)),
-                      );
-                    },
-                  ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Close'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -188,10 +149,57 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.calendar_month),
-            onPressed: _showHistoryDialog,
-            tooltip: 'History',
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (value) {
+              if (value == 'calendar') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HistoryScreen(
+                      history: history,
+                      service: _service,
+                    ),
+                  ),
+                );
+              } else if (value == 'all_poluskas') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AllPossiblePoluskasScreen(
+                      bufoTypes: bufoTypes,
+                      service: _service,
+                    ),
+                  ),
+                );
+              }
+            },
+            itemBuilder: (BuildContext context) => [
+              const PopupMenuItem<String>(
+                value: 'calendar',
+                child: Row(
+                  children: [
+                    Icon(Icons.calendar_month, color: Colors.black87),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text('Calendar', overflow: TextOverflow.ellipsis),
+                    ),
+                  ],
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'all_poluskas',
+                child: Row(
+                  children: [
+                    Icon(Icons.collections, color: Colors.black87),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text('See all possible Poluśkas', overflow: TextOverflow.ellipsis),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),

@@ -7,33 +7,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:daily_poluska/main.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class FakeAssetBundle extends AssetBundle {
-  @override
-  Future<ByteData> load(String key) async {
-    if (key == 'AssetManifest.json') {
-      final Map<String, List<String>> manifest = {
-        'assets/images/bufo-happy.png': ['assets/images/bufo-happy.png'],
-        'assets/images/bufo-sleepy.png': ['assets/images/bufo-sleepy.png'],
-      };
-      final jsonString = jsonEncode(manifest);
-      final bytes = utf8.encode(jsonString);
-      return ByteData.sublistView(Uint8List.fromList(bytes));
-    }
-    if (key == 'AssetManifest.bin') {
-      throw FlutterError('Manifest.bin not found');
-    }
-    return ByteData(0);
-  }
-
-  @override
-  Future<T> loadStructuredData<T>(String key, Future<T> Function(String value) parser) async {
-    if (key == 'AssetManifest.json') {
-      return parser('{"assets/images/bufo-happy.png": ["assets/images/bufo-happy.png"], "assets/images/bufo-sleepy.png": ["assets/images/bufo-sleepy.png"]}');
-    }
-    throw UnimplementedError();
-  }
-}
-
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -45,13 +18,32 @@ void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     prefs = await SharedPreferences.getInstance();
+
+    // Mock rootBundle assets at the binary messenger level
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMessageHandler(
+      'flutter/assets',
+      (ByteData? message) async {
+        if (message == null) return null;
+        final key = utf8.decode(message.buffer.asUint8List(message.offsetInBytes, message.lengthInBytes));
+        if (key == 'AssetManifest.json') {
+          final Map<String, List<String>> manifest = {
+            'assets/images/bufo-happy.png': ['assets/images/bufo-happy.png'],
+            'assets/images/bufo-sleepy.png': ['assets/images/bufo-sleepy.png'],
+          };
+          final jsonString = jsonEncode(manifest);
+          final bytes = utf8.encode(jsonString);
+          return ByteData.sublistView(Uint8List.fromList(bytes));
+        }
+        if (key == 'AssetManifest.bin') {
+          return null; // Return null to force JSON fallback
+        }
+        return ByteData(0);
+      },
+    );
   });
 
   Widget buildTestWidget(SharedPreferences prefs) {
-    return DefaultAssetBundle(
-      bundle: FakeAssetBundle(),
-      child: DailyPoluskaApp(prefs: prefs),
-    );
+    return DailyPoluskaApp(prefs: prefs);
   }
 
   testWidgets('Initial load shows Find Out! button when today is unrolled', (WidgetTester tester) async {
@@ -142,17 +134,52 @@ void main() {
     expect(find.text('Is this how you feel today?'), findsOneWidget);
   });
 
-  testWidgets('Opening history dialog shows dialog', (WidgetTester tester) async {
+  testWidgets('Opening history screen via kebab menu', (WidgetTester tester) async {
     await tester.pumpWidget(buildTestWidget(prefs));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byIcon(Icons.calendar_month));
+    // Tap kebab menu
+    await tester.tap(find.byIcon(Icons.more_vert));
     await tester.pumpAndSettle();
 
+    // Tap Calendar option
+    await tester.tap(find.text('Calendar'));
+    await tester.pumpAndSettle();
+
+    // We should be on the HistoryScreen
     expect(find.text('Past Poluśkas'), findsOneWidget);
-    expect(find.text('Close'), findsOneWidget);
-
-    await tester.tap(find.text('Close'));
+    
+    // Tap back button
+    await tester.tap(find.byTooltip('Back'));
     await tester.pumpAndSettle();
+
+    // Back to main screen
+    expect(find.text('What kind of Poluśka are you today?'), findsOneWidget);
+  });
+
+  testWidgets('Opening all possible Poluskas screen and searching', (WidgetTester tester) async {
+    await tester.pumpWidget(buildTestWidget(prefs));
+    await tester.pumpAndSettle();
+
+    // Tap kebab menu
+    await tester.tap(find.byIcon(Icons.more_vert));
+    await tester.pumpAndSettle();
+
+    // Tap See all possible Poluśkas option
+    await tester.tap(find.text('See all possible Poluśkas'));
+    await tester.pumpAndSettle();
+
+    // We should be on the AllPossiblePoluskasScreen
+    expect(find.text('All Poluśkas'), findsOneWidget);
+    expect(find.text('Poluśka Happy'), findsOneWidget);
+    expect(find.text('Poluśka Sleepy'), findsOneWidget);
+
+    // Type query "sleepy" into search field
+    await tester.enterText(find.byType(TextField), 'sleepy');
+    await tester.pumpAndSettle();
+
+    // Should filter out "Poluśka Happy"
+    expect(find.text('Poluśka Happy'), findsNothing);
+    expect(find.text('Poluśka Sleepy'), findsOneWidget);
   });
 }
