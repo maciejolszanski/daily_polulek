@@ -262,31 +262,34 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             ),
                           ),
                           const Spacer(flex: 1),
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'Polulek',
-                                style: GoogleFonts.outfit(fontSize: 22, color: Colors.black87),
-                              ),
-                              Builder(
-                                builder: (context) {
-                                  String fullName = _formatBufoName(todaysBufo!);
-                                  String mainWord = fullName.replaceAll('Polulek', '').trim();
-                                  if (mainWord.isEmpty) mainWord = "Bufo";
-                                  return Text(
-                                    '$mainWord!',
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.fredoka(
-                                      fontSize: 72, 
-                                      fontWeight: FontWeight.w600, 
-                                      color: const Color(0xFF4A6B42),
-                                      height: 1.0,
+                          Builder(
+                            builder: (context) {
+                              final segments = _service.splitBufoNameForStyling(todaysBufo!);
+                              return RichText(
+                                textAlign: TextAlign.center,
+                                text: TextSpan(
+                                  style: GoogleFonts.fredoka(
+                                    fontSize: 72, 
+                                    fontWeight: FontWeight.w600, 
+                                    height: 1.1,
+                                  ),
+                                  children: [
+                                    ...segments.map((segment) {
+                                      return TextSpan(
+                                        text: segment.text,
+                                        style: TextStyle(
+                                          color: segment.isPolulek ? const Color(0xFFC87A53) : const Color(0xFF4A6B42),
+                                        ),
+                                      );
+                                    }),
+                                    const TextSpan(
+                                      text: '!',
+                                      style: TextStyle(color: Color(0xFF4A6B42)),
                                     ),
-                                  );
-                                }
-                              ),
-                            ],
+                                  ],
+                                ),
+                              );
+                            }
                           ),
                           const Spacer(flex: 3),
                           if (!isConfirmed) ...[

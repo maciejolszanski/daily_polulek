@@ -25,17 +25,19 @@ void main() {
       (ByteData? message) async {
         if (message == null) return null;
         final key = utf8.decode(message.buffer.asUint8List(message.offsetInBytes, message.lengthInBytes));
+        
+        final manifest = {
+          'assets/images/bufo-happy.png': <Object?>['assets/images/bufo-happy.png'],
+          'assets/images/bufo-sleepy.png': <Object?>['assets/images/bufo-sleepy.png'],
+        };
+
+        if (key == 'AssetManifest.bin') {
+          return const StandardMessageCodec().encodeMessage(manifest);
+        }
         if (key == 'AssetManifest.json') {
-          final Map<String, List<String>> manifest = {
-            'assets/images/bufo-happy.png': ['assets/images/bufo-happy.png'],
-            'assets/images/bufo-sleepy.png': ['assets/images/bufo-sleepy.png'],
-          };
           final jsonString = jsonEncode(manifest);
           final bytes = utf8.encode(jsonString);
           return ByteData.sublistView(Uint8List.fromList(bytes));
-        }
-        if (key == 'AssetManifest.bin') {
-          return null; // Return null to force JSON fallback
         }
         return ByteData(0);
       },
@@ -63,7 +65,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Today, you are...'), findsOneWidget);
-    expect(find.text('Polulek'), findsOneWidget);
     expect(find.text('Is this how you feel today?'), findsOneWidget);
     expect(find.text('Yes!'), findsOneWidget);
     expect(find.text('No, re-roll'), findsOneWidget);
@@ -77,10 +78,11 @@ void main() {
     await tester.pumpAndSettle();
 
     String? getNameText() {
-      final textWidgets = tester.widgetList<Text>(find.byType(Text));
-      for (final text in textWidgets) {
-        final data = text.data;
-        if (data != null && data.endsWith('!') && data != 'Find Out!' && data != 'Yes!') {
+      final richTexts = tester.widgetList<RichText>(find.byType(RichText));
+      for (final rt in richTexts) {
+        final textSpan = rt.text as TextSpan;
+        final data = textSpan.toPlainText();
+        if (data.endsWith('!') && data != 'Find Out!' && data != 'Yes!') {
           return data;
         }
       }

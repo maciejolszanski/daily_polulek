@@ -22,6 +22,30 @@ class PolulekService {
     return words.join(' ');
   }
 
+  // Returns a list of segments, marking which ones are the word 'Polulek'
+  List<({String text, bool isPolulek})> splitBufoNameForStyling(String bufo) {
+    final full = formatBufoName(bufo);
+    final segments = <({String text, bool isPolulek})>[];
+    
+    final RegExp exp = RegExp(r'(Polulek)', caseSensitive: false);
+    final Iterable<RegExpMatch> matches = exp.allMatches(full);
+    
+    int lastEnd = 0;
+    for (final match in matches) {
+      if (match.start > lastEnd) {
+        segments.add((text: full.substring(lastEnd, match.start), isPolulek: false));
+      }
+      segments.add((text: match.group(0)!, isPolulek: true));
+      lastEnd = match.end;
+    }
+    
+    if (lastEnd < full.length) {
+      segments.add((text: full.substring(lastEnd), isPolulek: false));
+    }
+    
+    return segments;
+  }
+
   String getTodayDateString() {
     final now = DateTime.now();
     return "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
