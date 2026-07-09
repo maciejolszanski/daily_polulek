@@ -252,15 +252,18 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             style: GoogleFonts.outfit(fontSize: 28, color: const Color(0xFF3E4A43)),
                           ),
                           const Spacer(flex: 1),
+                          const SizedBox(height: 24),
                           ScaleTransition(
                             scale: _scaleAnimation,
                             child: Image.asset(
                               todaysBufo!.contains('.') ? 'assets/images/$todaysBufo' : 'assets/images/$todaysBufo.png',
-                              width: 250,
-                              height: 250,
+                              width: 180,
+                              height: 180,
+                              fit: BoxFit.contain,
                               errorBuilder: (context, error, stackTrace) => const Icon(Icons.image_not_supported, size: 100),
                             ),
                           ),
+                          const SizedBox(height: 24),
                           const Spacer(flex: 1),
                           Builder(
                             builder: (context) {
