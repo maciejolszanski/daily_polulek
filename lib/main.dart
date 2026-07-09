@@ -2,25 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'poluska_service.dart';
+import 'polulek_service.dart';
 import 'history_screen.dart';
-import 'all_possible_poluskas_screen.dart';
+import 'all_possible_poluleks_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
-  runApp(DailyPoluskaApp(prefs: prefs));
+  runApp(DailyPolulekApp(prefs: prefs));
 }
 
-class DailyPoluskaApp extends StatelessWidget {
+class DailyPolulekApp extends StatelessWidget {
   final SharedPreferences prefs;
 
-  const DailyPoluskaApp({super.key, required this.prefs});
+  const DailyPolulekApp({super.key, required this.prefs});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Daily Poluśka',
+      title: 'Daily Polulek',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -47,7 +47,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
-  final _service = PoluskaService();
+  final _service = PolulekService();
   List<String> bufoTypes = [];
   Map<String, String> history = {};
   String? todaysBufo;
@@ -144,7 +144,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Daily Poluśka', style: TextStyle(fontWeight: FontWeight.w600)),
+        title: const Text('Daily Polulek', style: TextStyle(fontWeight: FontWeight.w600)),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -162,11 +162,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     ),
                   ),
                 );
-              } else if (value == 'all_poluskas') {
+              } else if (value == 'all_poluleks') {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AllPossiblePoluskasScreen(
+                    builder: (context) => AllPossiblePoluleksScreen(
                       bufoTypes: bufoTypes,
                       service: _service,
                     ),
@@ -188,13 +188,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 ),
               ),
               const PopupMenuItem<String>(
-                value: 'all_poluskas',
+                value: 'all_poluleks',
                 child: Row(
                   children: [
                     Icon(Icons.collections, color: Colors.black87),
                     SizedBox(width: 8),
                     Expanded(
-                      child: Text('See all possible Poluśkas', overflow: TextOverflow.ellipsis),
+                      child: Text('See all possible Poluleks', overflow: TextOverflow.ellipsis),
                     ),
                   ],
                 ),
@@ -220,7 +220,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         if (todaysBufo == null) ...[
                           const Spacer(),
                           Text(
-                            'What kind of Poluśka are you today?',
+                            'What kind of Polulek are you today?',
                             textAlign: TextAlign.center,
                             style: GoogleFonts.outfit(fontSize: 28, color: const Color(0xFF3E4A43)),
                           ),
@@ -266,13 +266,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                'Poluśka',
+                                'Polulek',
                                 style: GoogleFonts.outfit(fontSize: 22, color: Colors.black87),
                               ),
                               Builder(
                                 builder: (context) {
                                   String fullName = _formatBufoName(todaysBufo!);
-                                  String mainWord = fullName.replaceAll('Poluśka', '').trim();
+                                  String mainWord = fullName.replaceAll('Polulek', '').trim();
                                   if (mainWord.isEmpty) mainWord = "Bufo";
                                   return Text(
                                     '$mainWord!',
@@ -323,7 +323,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             ),
                           ] else ...[
                             Text(
-                              'Come back tomorrow for a new Poluśka!',
+                              'Come back tomorrow for a new Polulek!',
                               textAlign: TextAlign.center,
                               style: GoogleFonts.kodeMono(fontSize: 14, color: Colors.black87),
                             ),

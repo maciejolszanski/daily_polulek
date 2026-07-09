@@ -1,41 +1,41 @@
 import 'dart:math';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:daily_poluska/poluska_service.dart';
+import 'package:daily_polulek/polulek_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  late PoluskaService service;
+  late PolulekService service;
 
   setUp(() {
-    service = PoluskaService();
+    service = PolulekService();
   });
 
   group('formatBufoName', () {
     test('formats basic name by removing extension and capitalization', () {
-      expect(service.formatBufoName('bufo-happy.png'), 'Poluśka Happy');
+      expect(service.formatBufoName('bufo-happy.png'), 'Polulek Happy');
     });
 
     test('formats name with bufo prefix', () {
-      expect(service.formatBufoName('bufo-takes-a-bath.png'), 'Poluśka Takes A Bath');
+      expect(service.formatBufoName('bufo-takes-a-bath.png'), 'Polulek Takes A Bath');
     });
 
     test('formats name with bufo suffix', () {
-      expect(service.formatBufoName('salty-bufo.png'), 'Salty Poluśka');
+      expect(service.formatBufoName('salty-bufo.png'), 'Salty Polulek');
     });
 
     test('formats name with bufo in the middle', () {
-      expect(service.formatBufoName('big-bufo-energy.png'), 'Big Poluśka Energy');
+      expect(service.formatBufoName('big-bufo-energy.png'), 'Big Polulek Energy');
     });
 
     test('formats name case-insensitively for bufo occurrences', () {
-      expect(service.formatBufoName('BUFO-Sleepy.png'), 'Poluśka Sleepy');
-      expect(service.formatBufoName('sleepy-BUFO.png'), 'Sleepy Poluśka');
+      expect(service.formatBufoName('BUFO-Sleepy.png'), 'Polulek Sleepy');
+      expect(service.formatBufoName('sleepy-BUFO.png'), 'Sleepy Polulek');
     });
 
     test('replaces dashes and underscores with spaces', () {
-      expect(service.formatBufoName('very_sleepy_bufo.png'), 'Very Sleepy Poluśka');
-      expect(service.formatBufoName('super-duper-happy-bufo.png'), 'Super Duper Happy Poluśka');
+      expect(service.formatBufoName('very_sleepy_bufo.png'), 'Very Sleepy Polulek');
+      expect(service.formatBufoName('super-duper-happy-bufo.png'), 'Super Duper Happy Polulek');
     });
 
     test('returns empty string if input is empty', () {

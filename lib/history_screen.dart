@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'poluska_service.dart';
+import 'polulek_service.dart';
 
 class HistoryScreen extends StatelessWidget {
   final Map<String, String> history;
-  final PoluskaService service;
+  final PolulekService service;
 
   const HistoryScreen({
     super.key,
@@ -19,7 +19,7 @@ class HistoryScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Past Poluśkas', style: TextStyle(fontWeight: FontWeight.w600)),
+        title: const Text('Past Poluleks', style: TextStyle(fontWeight: FontWeight.w600)),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,

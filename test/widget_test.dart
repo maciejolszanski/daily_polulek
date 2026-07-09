@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:daily_poluska/main.dart';
+import 'package:daily_polulek/main.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() {
@@ -43,7 +43,7 @@ void main() {
   });
 
   Widget buildTestWidget(SharedPreferences prefs) {
-    return DailyPoluskaApp(prefs: prefs);
+    return DailyPolulekApp(prefs: prefs);
   }
 
   testWidgets('Initial load shows Find Out! button when today is unrolled', (WidgetTester tester) async {
@@ -51,7 +51,7 @@ void main() {
     await tester.pump();
     await tester.pumpAndSettle();
 
-    expect(find.text('What kind of Poluśka are you today?'), findsOneWidget);
+    expect(find.text('What kind of Polulek are you today?'), findsOneWidget);
     expect(find.text('Find Out!'), findsOneWidget);
   });
 
@@ -63,7 +63,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Today, you are...'), findsOneWidget);
-    expect(find.text('Poluśka'), findsOneWidget);
+    expect(find.text('Polulek'), findsOneWidget);
     expect(find.text('Is this how you feel today?'), findsOneWidget);
     expect(find.text('Yes!'), findsOneWidget);
     expect(find.text('No, re-roll'), findsOneWidget);
@@ -108,7 +108,7 @@ void main() {
     await tester.tap(find.byIcon(Icons.check));
     await tester.pumpAndSettle();
 
-    expect(find.text('Come back tomorrow for a new Poluśka!'), findsOneWidget);
+    expect(find.text('Come back tomorrow for a new Polulek!'), findsOneWidget);
     expect(find.text('Actually, I feel different...'), findsOneWidget);
 
     final String? historyJson = prefs.getString('bufo_history');
@@ -126,7 +126,7 @@ void main() {
     await tester.pumpWidget(buildTestWidget(prefs));
     await tester.pumpAndSettle();
 
-    expect(find.text('Come back tomorrow for a new Poluśka!'), findsOneWidget);
+    expect(find.text('Come back tomorrow for a new Polulek!'), findsOneWidget);
 
     await tester.tap(find.text('Actually, I feel different...'));
     await tester.pumpAndSettle();
@@ -147,17 +147,17 @@ void main() {
     await tester.pumpAndSettle();
 
     // We should be on the HistoryScreen
-    expect(find.text('Past Poluśkas'), findsOneWidget);
+    expect(find.text('Past Poluleks'), findsOneWidget);
     
     // Tap back button
     await tester.tap(find.byTooltip('Back'));
     await tester.pumpAndSettle();
 
     // Back to main screen
-    expect(find.text('What kind of Poluśka are you today?'), findsOneWidget);
+    expect(find.text('What kind of Polulek are you today?'), findsOneWidget);
   });
 
-  testWidgets('Opening all possible Poluskas screen and searching', (WidgetTester tester) async {
+  testWidgets('Opening all possible Poluleks screen and searching', (WidgetTester tester) async {
     await tester.pumpWidget(buildTestWidget(prefs));
     await tester.pumpAndSettle();
 
@@ -165,21 +165,21 @@ void main() {
     await tester.tap(find.byIcon(Icons.more_vert));
     await tester.pumpAndSettle();
 
-    // Tap See all possible Poluśkas option
-    await tester.tap(find.text('See all possible Poluśkas'));
+    // Tap See all possible Poluleks option
+    await tester.tap(find.text('See all possible Poluleks'));
     await tester.pumpAndSettle();
 
-    // We should be on the AllPossiblePoluskasScreen
-    expect(find.text('All Poluśkas'), findsOneWidget);
-    expect(find.text('Poluśka Happy'), findsOneWidget);
-    expect(find.text('Poluśka Sleepy'), findsOneWidget);
+    // We should be on the AllPossiblePoluleksScreen
+    expect(find.text('All Poluleks'), findsOneWidget);
+    expect(find.text('Polulek Happy'), findsOneWidget);
+    expect(find.text('Polulek Sleepy'), findsOneWidget);
 
     // Type query "sleepy" into search field
     await tester.enterText(find.byType(TextField), 'sleepy');
     await tester.pumpAndSettle();
 
-    // Should filter out "Poluśka Happy"
-    expect(find.text('Poluśka Happy'), findsNothing);
-    expect(find.text('Poluśka Sleepy'), findsOneWidget);
+    // Should filter out "Polulek Happy"
+    expect(find.text('Polulek Happy'), findsNothing);
+    expect(find.text('Polulek Sleepy'), findsOneWidget);
   });
 }

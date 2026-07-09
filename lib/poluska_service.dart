@@ -2,12 +2,12 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class PoluskaService {
+class PolulekService {
   String formatBufoName(String bufo) {
     int dotIndex = bufo.lastIndexOf('.');
     String name = dotIndex != -1 ? bufo.substring(0, dotIndex) : bufo;
     
-    String formatted = name.replaceAll(RegExp(r'-bufo-|-bufo|_bufo_|bufo-|bufo_|_bufo|bufo', caseSensitive: false), ' Poluśka ');
+    String formatted = name.replaceAll(RegExp(r'-bufo-|-bufo|_bufo_|bufo-|bufo_|_bufo|bufo', caseSensitive: false), ' Polulek ');
     formatted = formatted.replaceAll('-', ' ').replaceAll('_', ' ');
     formatted = formatted.replaceAll(RegExp(r'\s+'), ' ').trim();
     

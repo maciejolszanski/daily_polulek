@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'poluska_service.dart';
+import 'polulek_service.dart';
 
-class AllPossiblePoluskasScreen extends StatefulWidget {
+class AllPossiblePoluleksScreen extends StatefulWidget {
   final List<String> bufoTypes;
-  final PoluskaService service;
+  final PolulekService service;
 
-  const AllPossiblePoluskasScreen({
+  const AllPossiblePoluleksScreen({
     super.key,
     required this.bufoTypes,
     required this.service,
   });
 
   @override
-  State<AllPossiblePoluskasScreen> createState() => _AllPossiblePoluskasScreenState();
+  State<AllPossiblePoluleksScreen> createState() => _AllPossiblePoluleksScreenState();
 }
 
-class _AllPossiblePoluskasScreenState extends State<AllPossiblePoluskasScreen> {
+class _AllPossiblePoluleksScreenState extends State<AllPossiblePoluleksScreen> {
   final TextEditingController _searchController = TextEditingController();
   List<String> _filteredBufos = [];
 
@@ -49,7 +49,7 @@ class _AllPossiblePoluskasScreenState extends State<AllPossiblePoluskasScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: const Text('All Poluśkas', style: TextStyle(fontWeight: FontWeight.w600)),
+        title: const Text('All Poluleks', style: TextStyle(fontWeight: FontWeight.w600)),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -61,7 +61,7 @@ class _AllPossiblePoluskasScreenState extends State<AllPossiblePoluskasScreen> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Search Poluśkas...',
+                hintText: 'Search Poluleks...',
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
@@ -83,7 +83,7 @@ class _AllPossiblePoluskasScreenState extends State<AllPossiblePoluskasScreen> {
             child: _filteredBufos.isEmpty
                 ? Center(
                     child: Text(
-                      'No matching Poluśkas found',
+                      'No matching Poluleks found',
                       style: GoogleFonts.outfit(fontSize: 18, color: Colors.black54),
                     ),
                   )
