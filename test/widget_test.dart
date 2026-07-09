@@ -142,12 +142,12 @@ void main() {
     await tester.tap(find.byIcon(Icons.more_vert));
     await tester.pumpAndSettle();
 
-    // Tap Calendar option
-    await tester.tap(find.text('Calendar'));
+    // Tap Past Polulkis option
+    await tester.tap(find.text('Past Polulkis'));
     await tester.pumpAndSettle();
 
     // We should be on the HistoryScreen
-    expect(find.text('Past Poluleks'), findsOneWidget);
+    expect(find.text('Past Polulkis'), findsOneWidget);
     
     // Tap back button
     await tester.tap(find.byTooltip('Back'));
@@ -157,7 +157,7 @@ void main() {
     expect(find.text('What kind of Polulek are you today?'), findsOneWidget);
   });
 
-  testWidgets('Opening all possible Poluleks screen and searching', (WidgetTester tester) async {
+  testWidgets('Opening all possible Polulkis screen and searching', (WidgetTester tester) async {
     await tester.pumpWidget(buildTestWidget(prefs));
     await tester.pumpAndSettle();
 
@@ -165,12 +165,12 @@ void main() {
     await tester.tap(find.byIcon(Icons.more_vert));
     await tester.pumpAndSettle();
 
-    // Tap See all possible Poluleks option
-    await tester.tap(find.text('See all possible Poluleks'));
+    // Tap See all possible Polulkis option
+    await tester.tap(find.text('See all possible Polulkis'));
     await tester.pumpAndSettle();
 
-    // We should be on the AllPossiblePoluleksScreen
-    expect(find.text('All Poluleks'), findsOneWidget);
+    // We should be on the AllPossiblePolulkisScreen
+    expect(find.text('All Polulkis'), findsOneWidget);
     expect(find.text('Polulek Happy'), findsOneWidget);
     expect(find.text('Polulek Sleepy'), findsOneWidget);
 

@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'polulek_service.dart';
 import 'history_screen.dart';
-import 'all_possible_poluleks_screen.dart';
+import 'all_possible_polulkis_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -162,11 +162,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     ),
                   ),
                 );
-              } else if (value == 'all_poluleks') {
+              } else if (value == 'all_polulkis') {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AllPossiblePoluleksScreen(
+                    builder: (context) => AllPossiblePolulkisScreen(
                       bufoTypes: bufoTypes,
                       service: _service,
                     ),
@@ -182,19 +182,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     Icon(Icons.calendar_month, color: Colors.black87),
                     SizedBox(width: 8),
                     Expanded(
-                      child: Text('Calendar', overflow: TextOverflow.ellipsis),
+                      child: Text('Past Polulkis', overflow: TextOverflow.ellipsis),
                     ),
                   ],
                 ),
               ),
               const PopupMenuItem<String>(
-                value: 'all_poluleks',
+                value: 'all_polulkis',
                 child: Row(
                   children: [
                     Icon(Icons.collections, color: Colors.black87),
                     SizedBox(width: 8),
                     Expanded(
-                      child: Text('See all possible Poluleks', overflow: TextOverflow.ellipsis),
+                      child: Text('See all possible Polulkis', overflow: TextOverflow.ellipsis),
                     ),
                   ],
                 ),

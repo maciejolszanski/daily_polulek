@@ -2,21 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'polulek_service.dart';
 
-class AllPossiblePoluleksScreen extends StatefulWidget {
+class AllPossiblePolulkisScreen extends StatefulWidget {
   final List<String> bufoTypes;
   final PolulekService service;
 
-  const AllPossiblePoluleksScreen({
+  const AllPossiblePolulkisScreen({
     super.key,
     required this.bufoTypes,
     required this.service,
   });
 
   @override
-  State<AllPossiblePoluleksScreen> createState() => _AllPossiblePoluleksScreenState();
+  State<AllPossiblePolulkisScreen> createState() => _AllPossiblePolulkisScreenState();
 }
 
-class _AllPossiblePoluleksScreenState extends State<AllPossiblePoluleksScreen> {
+class _AllPossiblePolulkisScreenState extends State<AllPossiblePolulkisScreen> {
   final TextEditingController _searchController = TextEditingController();
   List<String> _filteredBufos = [];
 
@@ -49,7 +49,7 @@ class _AllPossiblePoluleksScreenState extends State<AllPossiblePoluleksScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: const Text('All Poluleks', style: TextStyle(fontWeight: FontWeight.w600)),
+        title: const Text('All Polulkis', style: TextStyle(fontWeight: FontWeight.w600)),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -61,7 +61,7 @@ class _AllPossiblePoluleksScreenState extends State<AllPossiblePoluleksScreen> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Search Poluleks...',
+                hintText: 'Search Polulkis...',
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
@@ -83,7 +83,7 @@ class _AllPossiblePoluleksScreenState extends State<AllPossiblePoluleksScreen> {
             child: _filteredBufos.isEmpty
                 ? Center(
                     child: Text(
-                      'No matching Poluleks found',
+                      'No matching Polulkis found',
                       style: GoogleFonts.outfit(fontSize: 18, color: Colors.black54),
                     ),
                   )

@@ -19,7 +19,7 @@ class HistoryScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Past Poluleks', style: TextStyle(fontWeight: FontWeight.w600)),
+        title: const Text('Past Polulkis', style: TextStyle(fontWeight: FontWeight.w600)),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
